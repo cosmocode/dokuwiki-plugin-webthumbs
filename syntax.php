@@ -1,12 +1,10 @@
 <?php
 /**
- * Plugin Now: Inserts a timestamp.
- *
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @author     Christoph Lang <calbity@gmx.de>
+ * @author     Andreas Gohr <gohr@cosmocode.de>
  */
 
-// based on http://wiki.splitbrain.org/plugin:tutorial
 
 // must be run within DokuWiki
 if (!defined('DOKU_INC')) die();
@@ -20,20 +18,9 @@ require_once(DOKU_PLUGIN . 'syntax.php');
  */
 class syntax_plugin_webthumbs extends DokuWiki_Syntax_Plugin {
 
-     //http://open.thumbshots.org/image.pxf?url=http://www.sdzecom.de
-     //http://www.thumbshots.de/cgi-bin/show.cgi?url=http://www.sdzecom.de
-     private $sWebService = "http://open.thumbshots.org/image.pxf?url=";
-
-    function getInfo() {
-        return array(
-        'author'  => 'Christoph Lang',
-        'email'   => 'calbity@gmx.de',
-        'date'    => '2009-01-20',
-        'name'    => 'Webthumbnails Plugin',
-        'desc'    => 'Zeigt Thumbnails von Webseiten an.',
-        'url'     => 'http://www.google.de'
-        );
-    }
+    //http://open.thumbshots.org/image.pxf?url=http://www.sdzecom.de
+    //http://www.thumbshots.de/cgi-bin/show.cgi?url=http://www.sdzecom.de
+    private $sWebService = "http://open.thumbshots.org/image.pxf?url=";
 
     function connectTo($mode) {
         $this->Lexer->addSpecialPattern('\<webthumb\:.*?\>', $mode, 'plugin_webthumbs');
@@ -44,31 +31,23 @@ class syntax_plugin_webthumbs extends DokuWiki_Syntax_Plugin {
     function getSort() { return 267; }
 
     function handle($match, $state, $pos, &$handler) {
+        $match = substr($match,10,-1);
 
-          $aResponse = array();
-         $temp = substr($match,10,-1);
-         $aResponse = explode("|",$temp);
-          if(!isset($aResponse[1]))
-           $aResponse[1] = $aResponse[0];
-        return $aResponse;
+        list($url,$link) = explode('|',$match,2);
+        $url  = trim($url);
+        $link = trim($link);
+        if(!$link) $link = $url;
 
-    }
-    function _preview($data) {
-
-                $sResponse = "";
-
-                $sResponse = '<a href="'.$data[1].'"><img src="'.$this->sWebService.$data[0].'" style="border: 1px solid black;" /></a>';
-                return $sResponse;
-
+        return array($url,$link);
     }
 
-    function render($mode, &$renderer, $data) {
+    function render($mode, &$R, $data) {
+        $image = array(
+            'src'   => $this->sWebService.rawurlencode($data[0]).'&.png',
+            'cache' => 'nocache',
+        );
+        $R->externallink($data[1],$image);
 
-        if ($mode == 'xhtml') {
-                $renderer->doc .= $this->_preview($data);
-
-            return true;
-        }
-        return false;
+        return true;
     }
 }

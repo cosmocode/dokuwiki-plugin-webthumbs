@@ -1,0 +1,7 @@
+base   webthumbs
+author Christoph Lang
+email  calbity@gmx.de
+date   2009-01-20
+name   Webthumbnails Plugin
+desc   Show Thumbnail previews of websites
+url    http://www.dokuwiki.org/plugin:webthumbs
