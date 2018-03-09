@@ -30,7 +30,7 @@ class syntax_plugin_webthumbs extends DokuWiki_Syntax_Plugin {
 
     function getSort() { return 267; }
 
-    function handle($match, $state, $pos, &$handler) {
+    function handle($match, $state, $pos, Doku_Handler $handler) {
         $match = substr($match,10,-1);
 
         list($url,$link) = explode('|',$match,2);
@@ -41,7 +41,7 @@ class syntax_plugin_webthumbs extends DokuWiki_Syntax_Plugin {
         return array($url,$link);
     }
 
-    function render($mode, &$R, $data) {
+    function render($mode, Doku_Renderer $R, $data) {
         $image = array(
             'src'   => $this->sWebService.rawurlencode($data[0]).'&.png',
             'cache' => 'nocache',
